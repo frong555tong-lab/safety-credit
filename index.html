@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Safety Credit App</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f0f0;display:flex;justify-content:center;min-height:100vh;padding:20px}
+.shell{width:390px;background:#fff;border-radius:44px;border:1px solid #ddd;overflow:hidden;min-height:844px;display:flex;flex-direction:column}
+.notch{height:50px;display:flex;align-items:center;justify-content:space-between;padding:14px 22px 0;flex-shrink:0}
+.notch-time{font-size:15px;font-weight:600;color:#111}
+.screen{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{display:none}
+.navbar{flex-shrink:0;display:flex;justify-content:space-around;padding:8px 0 20px;border-top:0.5px solid #e8e8e8;background:#fff}
+.nb{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 12px;border:none;background:none;-webkit-tap-highlight-color:transparent;min-width:60px}
+.nl{font-size:10px;color:#999}
+.nl.on{color:#1D9E75}
+
+.sec{padding:0 16px 14px}
+.sec-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sec-title{font-size:12px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.5px}
+.link-btn{font-size:12px;color:#1D9E75;background:none;border:none;cursor:pointer;font-family:inherit}
+.card{background:#fff;border:0.5px solid #e8e8e8;border-radius:16px;padding:14px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.b-green{background:#E1F5EE;color:#085041}
+.b-amber{background:#FFF3CD;color:#7B5800}
+.b-blue{background:#E3F2FD;color:#0C447C}
+.b-red{background:#FFEBEE;color:#7F1D1D}
+.b-purple{background:#EDE7F6;color:#4527A0}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#f7f7f7;border-radius:12px;padding:10px;text-align:center}
+.stat-v{font-size:20px;font-weight:700;color:#111}
+.stat-l{font-size:11px;color:#888;margin-top:2px}
+.trip-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:0.5px solid #f0f0f0;cursor:pointer}
+.trip-row:last-child{border-bottom:none}
+.dot8{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.bar-t{height:5px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.bar-f{height:100%;border-radius:3px}
+.factor-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.factor-row:last-child{margin-bottom:0}
+.ficon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.btn-p{width:100%;padding:14px;border-radius:14px;background:#1D9E75;color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;margin-top:10px;font-family:inherit}
+.btn-s{width:100%;padding:13px;border-radius:14px;background:#f5f5f5;color:#333;font-size:15px;font-weight:500;border:none;cursor:pointer;margin-top:8px;font-family:inherit}
+.back-btn{background:none;border:none;cursor:pointer;color:#888;padding:0;display:flex;align-items:center}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:0.5px solid #f0f0f0;cursor:pointer}
+.prow:last-child{border-bottom:none}
+
+/* Education cards */
+.edu-card{border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;border:1px solid transparent;transition:opacity .15s}
+.edu-card:active{opacity:.8}
+.challenge-progress{height:6px;background:#e0e0e0;border-radius:3px;margin-top:8px;overflow:hidden}
+.quiz-opt{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;margin-bottom:8px;cursor:pointer;border:1.5px solid #e8e8e8;transition:all .15s}
+.quiz-opt.selected{border-color:#1D9E75;background:#E1F5EE}
+.quiz-opt.correct{border-color:#1D9E75;background:#E1F5EE}
+.quiz-opt.wrong{border-color:#E53935;background:#FFEBEE}
+
+@media(max-width:430px){
+  body{padding:0;background:#fff}
+  .shell{width:100%;border-radius:0;min-height:100vh;border:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="notch">
+  <span id="clk" style="font-size:15px;font-weight:600;color:#111">9:41</span>
+  <div style="display:flex;gap:5px;align-items:center;color:#555">
+    <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="5" width="2.5" height="6" rx="1"/><rect x="3.5" y="3" width="2.5" height="8" rx="1"/><rect x="7" y="1" width="2.5" height="10" rx="1"/><rect x="10.5" y="1" width="2.5" height="10" rx="1" opacity=".3"/></svg>
+    <svg width="18" height="11" viewBox="0 0 18 11" fill="currentColor"><rect x="0" y="1" width="13" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="1.5" y="2.5" width="8" height="6" rx="1"/><rect x="14" y="3.5" width="3" height="4" rx="1"/></svg>
+  </div>
+</div>
+
+<div class="screen">
+
+<!-- ░░ ONBOARDING ░░ -->
+<div id="pg-onboard" style="display:flex;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px;min-height:720px;text-align:center">
+    <div style="width:96px;height:96px;border-radius:28px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;margin-bottom:24px;border:1.5px solid #9FE1CB">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none"><path d="M26 6L8 14v14c0 11 8 20 18 23 10-3 18-12 18-23V14L26 6Z" fill="#1D9E75" stroke="#085041" stroke-width="1.5"/><path d="M18 26l6 6 10-10" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="font-size:30px;font-weight:700;color:#111;margin-bottom:6px">Safety Credit</div>
+    <div style="font-size:15px;color:#666;line-height:1.7;margin-bottom:10px">ขับดี คะแนนสูง รับสิทธิพิเศษทันที</div>
+    <div style="font-size:13px;color:#999;line-height:1.7;margin-bottom:36px">ระบบวัดพฤติกรรมการขับขี่จริงด้วย<br>Smartphone + Radar Dual Evidence</div>
+
+    <div style="width:100%;max-width:300px">
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+        <div style="display:flex;align-items:center;gap:12px;background:#f7f7f7;border-radius:12px;padding:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">📊</div>
+          <div style="text-align:left"><div style="font-size:13px;font-weight:600;color:#111">วัดพฤติกรรมจริง</div><div style="font-size:12px;color:#888">GPS + Accelerometer ตลอดการขับ</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7f7f7;border-radius:12px;padding:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#FFF3CD;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">📡</div>
+          <div style="text-align:left"><div style="font-size:13px;font-weight:600;color:#111">ยืนยันด้วย Radar</div><div style="font-size:12px;color:#888">Dual Evidence โกงไม่ได้</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7f7f7;border-radius:12px;padding:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🏆</div>
+          <div style="text-align:left"><div style="font-size:13px;font-weight:600;color:#111">คะแนนสูง = สิทธิพิเศษ</div><div style="font-size:12px;color:#888">ประกัน ที่จอดรถ ส่วนลด</div></div>
+        </div>
+      </div>
+      <button class="btn-p" onclick="nav('home')">เริ่มใช้งาน</button>
+      <div style="font-size:11px;color:#bbb;margin-top:14px;line-height:1.7">กดเริ่มใช้งานแสดงว่ายินยอมให้เก็บข้อมูล<br>ตำแหน่งและความเร็ว ตาม PDPA</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ░░ HOME ░░ -->
+<div id="pg-home" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:16px 16px 4px;display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-size:13px;color:#888">สวัสดี,</div><div style="font-size:18px;font-weight:700;color:#111">ฟร้อง</div></div>
+    <div style="width:38px;height:38px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#085041;border:1.5px solid #5DCAA5">ฟ</div>
+  </div>
+
+  <div style="text-align:center;padding:18px 16px 14px">
+    <div style="font-size:12px;color:#888;margin-bottom:12px;font-weight:500;letter-spacing:.3px">SAFETY SCORE · 30 วันล่าสุด</div>
+    <div style="position:relative;width:170px;height:170px;margin:0 auto">
+      <canvas id="ring" width="170" height="170" style="position:absolute;top:0;left:0"></canvas>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+        <div style="font-size:50px;font-weight:700;color:#111;line-height:1">78</div>
+        <div style="font-size:13px;color:#aaa">/100</div>
+      </div>
+    </div>
+    <div style="margin-top:14px"><span class="badge b-green">● Green — Safe</span></div>
+    <div style="font-size:12px;color:#1D9E75;margin-top:6px;font-weight:500">+4 คะแนน จากสัปดาห์ที่แล้ว</div>
+  </div>
+
+  <!-- Tier banner -->
+  <div style="margin:0 16px 14px;padding:14px 16px;background:#E1F5EE;border-radius:16px;border:1px solid #9FE1CB;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="nav('tier')">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#085041">สิทธิพิเศษของคุณ — Green Tier</div>
+      <div style="font-size:12px;color:#0F6E56;margin-top:3px">คะแนนถึงเกณฑ์ · ใช้สิทธิ์ได้ทันที</div>
+    </div>
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="#085041" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+
+  <!-- Breakdown -->
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">Breakdown คะแนน</span></div>
+    <div class="card">
+      <div class="factor-row">
+        <div class="ficon" style="background:#E1F5EE">🕐</div>
+        <span style="font-size:13px;color:#111;flex:1">Speed compliance</span>
+        <div class="bar-t" style="width:80px"><div class="bar-f" style="width:80%;background:#1D9E75"></div></div>
+        <span style="font-size:12px;color:#085041;width:36px;text-align:right;font-weight:600">28/35</span>
+      </div>
+      <div class="factor-row">
+        <div class="ficon" style="background:#FFEBEE">⚡</div>
+        <span style="font-size:13px;color:#111;flex:1">Harsh event</span>
+        <div class="bar-t" style="width:80px"><div class="bar-f" style="width:72%;background:#E53935"></div></div>
+        <span style="font-size:12px;color:#7F1D1D;width:36px;text-align:right;font-weight:600">18/25</span>
+      </div>
+      <div class="factor-row">
+        <div class="ficon" style="background:#E3F2FD">📈</div>
+        <span style="font-size:13px;color:#111;flex:1">Consistency</span>
+        <div class="bar-t" style="width:80px"><div class="bar-f" style="width:75%;background:#1976D2"></div></div>
+        <span style="font-size:12px;color:#0C447C;width:36px;text-align:right;font-weight:600">15/20</span>
+      </div>
+      <div class="factor-row">
+        <div class="ficon" style="background:#FFF8E1">📡</div>
+        <span style="font-size:13px;color:#111;flex:1">Radar checkpoint</span>
+        <div class="bar-t" style="width:80px"><div class="bar-f" style="width:83%;background:#F57F17"></div></div>
+        <span style="font-size:12px;color:#7B5800;width:36px;text-align:right;font-weight:600">10/12</span>
+      </div>
+      <div class="factor-row" style="margin-bottom:0;cursor:pointer" onclick="nav('education')">
+        <div class="ficon" style="background:#EDE7F6">🎓</div>
+        <span style="font-size:13px;color:#111;flex:1">Education bonus</span>
+        <div class="bar-t" style="width:80px"><div class="bar-f" style="width:87%;background:#7B1FA2"></div></div>
+        <span style="font-size:12px;color:#4527A0;width:36px;text-align:right;font-weight:600">7/8</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="g3" style="padding:0 16px 14px">
+    <div class="stat"><div class="stat-v">24</div><div class="stat-l">trips</div></div>
+    <div class="stat"><div class="stat-v" style="color:#1D9E75">7</div><div class="stat-l">วัน streak</div></div>
+    <div class="stat"><div class="stat-v" style="color:#E53935">3</div><div class="stat-l">harsh events</div></div>
+  </div>
+
+  <!-- Radar alert -->
+  <div style="margin:0 16px 14px;padding:11px 13px;border-radius:12px;border:1px solid #FFE082;background:#FFFDE7;display:flex;align-items:center;gap:8px">
+    <div style="width:8px;height:8px;border-radius:50%;background:#F57F17;flex-shrink:0"></div>
+    <span style="font-size:12px;color:#7B5800;font-weight:500">📡 Radar ถัดไป: หน้า มรภ. — 1.2 km</span>
+  </div>
+
+  <!-- Education teaser -->
+  <div style="margin:0 16px 14px;padding:13px 14px;border-radius:14px;border:1px solid #CE93D8;background:#F3E5F5;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="nav('education')">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#4527A0">🎓 Education bonus</div>
+      <div style="font-size:12px;color:#6A1B9A;margin-top:3px">Quiz รายสัปดาห์ · Challenge ใหม่รอคุณอยู่</div>
+    </div>
+    <span style="font-size:11px;font-weight:600;color:#fff;background:#7B1FA2;padding:3px 9px;border-radius:20px">+1 pts</span>
+  </div>
+
+  <!-- Trips -->
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">Trips ล่าสุด</span><button class="link-btn" onclick="nav('trips')">ดูทั้งหมด</button></div>
+    <div class="card" style="padding:2px 14px">
+      <div class="trip-row" onclick="nav('trip-detail')">
+        <div class="dot8" style="background:#1D9E75"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">บ้าน → มรภ. นครปฐม</div><div style="font-size:11px;color:#888">วันนี้ 08:14 · 4.2 km</div></div>
+        <span style="font-size:15px;font-weight:700;color:#1D9E75">82</span>
+      </div>
+      <div class="trip-row" onclick="nav('trip-detail')">
+        <div class="dot8" style="background:#F57F17"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">มรภ. → ตลาดนัด</div><div style="font-size:11px;color:#888">เมื่อวาน 17:52 · 2.8 km</div></div>
+        <span style="font-size:15px;font-weight:700;color:#F57F17">61</span>
+      </div>
+      <div class="trip-row" onclick="nav('trip-detail')" style="border-bottom:none">
+        <div class="dot8" style="background:#1D9E75"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">บ้าน → ซีพี เฟรชมาร์ท</div><div style="font-size:11px;color:#888">เมื่อวาน 10:05 · 1.5 km</div></div>
+        <span style="font-size:15px;font-weight:700;color:#1D9E75">88</span>
+      </div>
+    </div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+</div>
+
+<!-- ░░ TRIPS ░░ -->
+<div id="pg-trips" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:18px 16px 8px;font-size:20px;font-weight:700;color:#111">Trip History</div>
+  <div class="g3" style="padding:0 16px 14px">
+    <div class="stat"><div class="stat-v">24</div><div class="stat-l">เดือนนี้</div></div>
+    <div class="stat"><div class="stat-v" style="color:#1D9E75">76</div><div class="stat-l">avg score</div></div>
+    <div class="stat"><div class="stat-v">89 km</div><div class="stat-l">ระยะรวม</div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">เมษายน 2568</span></div>
+    <div class="card" style="padding:2px 14px">
+      <div class="trip-row" onclick="nav('trip-detail')">
+        <div class="dot8" style="background:#1D9E75"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">บ้าน → มรภ. นครปฐม</div><div style="font-size:11px;color:#888">วันนี้ 08:14 · 4.2 km · 18 นาที</div></div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:#1D9E75">82</div><span class="badge b-green" style="font-size:10px;padding:2px 7px">safe</span></div>
+      </div>
+      <div class="trip-row" onclick="nav('trip-detail')">
+        <div class="dot8" style="background:#F57F17"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">มรภ. → ตลาดนัด</div><div style="font-size:11px;color:#888">เมื่อวาน 17:52 · 2.8 km · 11 นาที</div></div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:#F57F17">61</div><span class="badge b-amber" style="font-size:10px;padding:2px 7px">amber</span></div>
+      </div>
+      <div class="trip-row" onclick="nav('trip-detail')">
+        <div class="dot8" style="background:#1D9E75"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">บ้าน → ซีพี เฟรชมาร์ท</div><div style="font-size:11px;color:#888">เมื่อวาน 10:05 · 1.5 km · 8 นาที</div></div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:#1D9E75">88</div><span class="badge b-green" style="font-size:10px;padding:2px 7px">safe</span></div>
+      </div>
+      <div class="trip-row" onclick="nav('trip-detail')">
+        <div class="dot8" style="background:#E53935"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">บ้าน → วัดพุทธมณฑล</div><div style="font-size:11px;color:#888">14 เม.ย. 19:30 · 6.1 km · 22 นาที</div></div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:#E53935">44</div><span class="badge b-red" style="font-size:10px;padding:2px 7px">at risk</span></div>
+      </div>
+      <div class="trip-row" style="border-bottom:none" onclick="nav('trip-detail')">
+        <div class="dot8" style="background:#1D9E75"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#111">มรภ. → บ้าน</div><div style="font-size:11px;color:#888">14 เม.ย. 17:10 · 4.0 km · 16 นาที</div></div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:700;color:#1D9E75">79</div><span class="badge b-green" style="font-size:10px;padding:2px 7px">safe</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+</div>
+
+<!-- ░░ TRIP DETAIL ░░ -->
+<div id="pg-trip-detail" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:16px 16px 6px;display:flex;align-items:center;gap:8px">
+    <button class="back-btn" onclick="nav('trips')"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M14 6L9 11l5 5" stroke="#666" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <span style="font-size:17px;font-weight:700;color:#111">รายละเอียด Trip</span>
+  </div>
+  <div style="margin:10px 16px;background:#f7f7f7;border-radius:16px;height:140px;display:flex;align-items:center;justify-content:center;border:0.5px solid #eee">
+    <div style="text-align:center"><div style="font-size:32px;margin-bottom:6px">🗺️</div><div style="font-size:12px;color:#aaa">แผนที่เส้นทาง</div></div>
+  </div>
+  <div class="sec">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div><div style="font-size:15px;font-weight:700;color:#111">บ้าน → มรภ. นครปฐม</div><div style="font-size:12px;color:#888;margin-top:3px">วันนี้ 08:14 · 18 นาที · 4.2 km</div></div>
+      <div style="font-size:44px;font-weight:700;color:#1D9E75;line-height:1">82</div>
+    </div>
+    <div class="g3" style="padding:0;margin-bottom:14px">
+      <div class="stat"><div class="stat-v">42</div><div class="stat-l">avg km/h</div></div>
+      <div class="stat"><div class="stat-v" style="color:#E53935">2</div><div class="stat-l">harsh brakes</div></div>
+      <div class="stat"><div class="stat-v" style="color:#1D9E75">pass</div><div class="stat-l">radar check</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;color:#111;margin-bottom:12px">Timeline เหตุการณ์</div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+        <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;margin-top:4px;flex-shrink:0"></div>
+        <div><div style="font-size:13px;font-weight:500;color:#111">08:14 — เริ่มต้น trip</div><div style="font-size:11px;color:#888">ถนนพุทธมณฑลสาย 2</div></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+        <div style="width:8px;height:8px;border-radius:50%;background:#F57F17;margin-top:4px;flex-shrink:0"></div>
+        <div><div style="font-size:13px;font-weight:500;color:#111">08:18 — เบรกกะทันหัน</div><div style="font-size:11px;color:#888">5.4G · −3 คะแนน · ดูเคล็ดลับได้ใน Education</div></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+        <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;margin-top:4px;flex-shrink:0"></div>
+        <div><div style="font-size:13px;font-weight:500;color:#111">08:22 — ผ่านจุด Radar</div><div style="font-size:11px;color:#888">58 km/h · limit 60 · ผ่าน ✓</div></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div style="width:8px;height:8px;border-radius:50%;background:#1D9E75;margin-top:4px;flex-shrink:0"></div>
+        <div><div style="font-size:13px;font-weight:500;color:#111">08:32 — ถึงปลายทาง</div><div style="font-size:11px;color:#888">trip สำเร็จ · score อัปเดตแล้ว</div></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding:12px;background:#E1F5EE;border-radius:12px;border:1px solid #9FE1CB">
+      <div style="font-size:12px;font-weight:700;color:#085041;margin-bottom:3px">💡 เคล็ดลับ</div>
+      <div style="font-size:12px;color:#0F6E56;line-height:1.6">เว้นระยะห่างรถข้างหน้าให้มากขึ้น จะลด harsh brake ได้</div>
+    </div>
+    <button class="btn-s" onclick="nav('education')" style="margin-top:10px">🎓 ดู Education bonus</button>
+  </div>
+  <div style="height:20px"></div>
+</div>
+</div>
+
+<!-- ░░ EDUCATION ░░ -->
+<div id="pg-education" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:18px 16px 8px;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:20px;font-weight:700;color:#111">🎓 Education</div>
+    <span class="badge b-purple">+7/8 pts สัปดาห์นี้</span>
+  </div>
+  <div style="padding:0 16px 14px;font-size:13px;color:#888;line-height:1.6">ทำกิจกรรมครบเพื่อรับ <strong style="color:#4527A0">Education Bonus</strong> สูงสุด 8 คะแนน<br>คะแนนเพิ่มจะช่วยให้ถึง Tier สูงขึ้นได้เร็วกว่า</div>
+
+  <!-- Progress summary -->
+  <div style="margin:0 16px 16px;padding:14px;background:#F3E5F5;border-radius:16px;border:1px solid #CE93D8">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:700;color:#4527A0">คะแนน Education สัปดาห์นี้</div>
+      <div style="font-size:22px;font-weight:700;color:#4527A0">7/8</div>
+    </div>
+    <div class="bar-t"><div class="bar-f" style="width:87%;background:#7B1FA2"></div></div>
+    <div style="font-size:11px;color:#6A1B9A;margin-top:5px">อีก 1 pts → ครบ 8 pts สัปดาห์นี้</div>
+  </div>
+
+  <!-- SECTION: คลิปสั้น -->
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">📹 คลิปสั้น (ดูจบ = +2 pts)</span></div>
+
+    <div class="edu-card" style="background:#E8F5E9;border-color:#A5D6A7" onclick="nav('video-player')">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:52px;height:52px;border-radius:12px;background:#2E7D32;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">▶️</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:#1B5E20">ทำไมเบรกกะทันหันอันตราย?</div>
+          <div style="font-size:12px;color:#388E3C;margin-top:3px">2:30 นาที · เกี่ยวกับ trip ล่าสุดของคุณ</div>
+          <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+            <div style="font-size:11px;font-weight:600;color:#fff;background:#2E7D32;padding:2px 9px;border-radius:20px">ดูเดี๋ยวนี้ +2 pts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="edu-card" style="background:#f7f7f7;border-color:#e0e0e0;opacity:.7">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:52px;height:52px;border-radius:12px;background:#bbb;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">✅</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:#555">ระยะหยุดรถที่ความเร็วต่างๆ</div>
+          <div style="font-size:12px;color:#888;margin-top:3px">ดูแล้ว · เมื่อวาน</div>
+          <div style="font-size:11px;color:#1D9E75;margin-top:4px;font-weight:600">+2 pts รับแล้ว ✓</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="edu-card" style="background:#f7f7f7;border-color:#e0e0e0;opacity:.7">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:52px;height:52px;border-radius:12px;background:#bbb;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">✅</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:#555">จุด Radar คืออะไร ช่วยอะไรได้?</div>
+          <div style="font-size:12px;color:#888;margin-top:3px">ดูแล้ว · 2 วันก่อน</div>
+          <div style="font-size:11px;color:#1D9E75;margin-top:4px;font-weight:600">+2 pts รับแล้ว ✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Quiz -->
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">❓ Quiz รายสัปดาห์ (ตอบถูกทั้งหมด = +4 pts)</span></div>
+    <div class="card" style="cursor:pointer" onclick="nav('quiz')">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:52px;height:52px;border-radius:12px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px">❓</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:#111">Quiz สัปดาห์นี้</div>
+          <div style="font-size:12px;color:#888;margin-top:3px">3 ข้อ · เกี่ยวกับกฎจราจรและการขับขี่ปลอดภัย</div>
+          <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+            <div style="font-size:11px;font-weight:600;color:#fff;background:#1976D2;padding:2px 9px;border-radius:20px">ทำ Quiz +4 pts</div>
+            <div style="font-size:11px;color:#888">หมดเขต อาทิตย์ 23:59</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Challenge -->
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">🏁 Challenge สัปดาห์นี้ (ทำสำเร็จ = +6 pts)</span></div>
+
+    <div class="edu-card" style="background:#FFF8E1;border-color:#FFE082">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#7B5800">ผ่านจุด Radar ≤ 60 km/h</div>
+          <div style="font-size:12px;color:#F57F17;margin-top:3px">ทำซ้ำ 5 ครั้งติดต่อกัน</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:#fff;background:#F57F17;padding:3px 10px;border-radius:20px">+6 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:6px">
+        <span>ความคืบหน้า</span><span style="color:#7B5800;font-weight:600">3/5 ครั้ง</span>
+      </div>
+      <div class="challenge-progress"><div style="height:100%;width:60%;background:#F57F17;border-radius:3px"></div></div>
+      <div style="font-size:11px;color:#888;margin-top:6px">อีก 2 ครั้ง → รับ +6 pts · หมดเขต อาทิตย์นี้</div>
+    </div>
+
+    <div class="edu-card" style="background:#f7f7f7;border-color:#e0e0e0;margin-top:0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#555">ขับ 7 วันติดต่อกันโดยไม่มี Harsh Event</div>
+          <div style="font-size:12px;color:#888;margin-top:3px">ต้องการ 7 วันต่อเนื่อง</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:#fff;background:#9E9E9E;padding:3px 10px;border-radius:20px">+6 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:6px">
+        <span>ความคืบหน้า</span><span>5/7 วัน</span>
+      </div>
+      <div class="challenge-progress"><div style="height:100%;width:71%;background:#9E9E9E;border-radius:3px"></div></div>
+    </div>
+  </div>
+
+  <!-- Upcoming next week -->
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">📅 สัปดาห์หน้า</span></div>
+    <div style="padding:12px 14px;background:#f7f7f7;border-radius:12px;font-size:13px;color:#888;line-height:1.7">
+      คลิปใหม่และ Quiz จะรีเซ็ตทุกวันจันทร์ 00:00<br>Challenge จะออกใหม่ทุกสัปดาห์
+    </div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+</div>
+
+<!-- ░░ VIDEO PLAYER ░░ -->
+<div id="pg-video-player" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:16px 16px 6px;display:flex;align-items:center;gap:8px">
+    <button class="back-btn" onclick="nav('education')"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M14 6L9 11l5 5" stroke="#666" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <span style="font-size:17px;font-weight:700;color:#111">ดูคลิป</span>
+  </div>
+  <!-- Video mock -->
+  <div style="background:#111;height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative">
+    <div style="font-size:50px;margin-bottom:8px">▶️</div>
+    <div style="font-size:13px;color:#aaa">กดเล่นคลิป</div>
+    <!-- Progress bar -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:#333">
+      <div id="vpbar" style="height:100%;width:0%;background:#E53935;transition:width .1s"></div>
+    </div>
+    <div style="position:absolute;bottom:6px;right:10px;font-size:11px;color:#aaa" id="vptime">0:00 / 2:30</div>
+  </div>
+  <div class="sec" style="padding-top:14px">
+    <div style="font-size:16px;font-weight:700;color:#111;margin-bottom:6px">ทำไมเบรกกะทันหันอันตราย?</div>
+    <div style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.6">เรียนรู้ว่าเหตุใดการเบรกกะทันหันจึงเพิ่มความเสี่ยงอุบัติเหตุ และวิธีพัฒนาพฤติกรรมการขับขี่</div>
+
+    <div style="padding:12px;background:#FFF8E1;border-radius:12px;border:1px solid #FFE082;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:#7B5800;margin-bottom:6px">ประเด็นสำคัญในคลิป</div>
+      <div style="font-size:12px;color:#7B5800;line-height:1.8">• เบรกกะทันหัน = รถหลังตามไม่ทัน<br>• ระยะหยุดรถที่ 60 km/h ≈ 36 เมตร<br>• เว้นระยะ 2 วิ ช่วยลด harsh brake ได้ 80%</div>
+    </div>
+
+    <button class="btn-p" id="vp-done-btn" onclick="completeVideo()" style="background:#9E9E9E">ดูคลิปก่อนรับคะแนน...</button>
+    <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px" id="vp-hint">คลิปต้องดูอย่างน้อย 80% จึงรับคะแนนได้</div>
+  </div>
+</div>
+</div>
+
+<!-- ░░ QUIZ ░░ -->
+<div id="pg-quiz" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:16px 16px 6px;display:flex;align-items:center;gap:8px">
+    <button class="back-btn" onclick="nav('education')"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M14 6L9 11l5 5" stroke="#666" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <span style="font-size:17px;font-weight:700;color:#111">Quiz รายสัปดาห์</span>
+  </div>
+
+  <div style="margin:12px 16px;padding:10px 14px;background:#E3F2FD;border-radius:12px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:13px;color:#0C447C;font-weight:600">ข้อ <span id="q-num">1</span>/3</span>
+    <span class="badge b-blue">ตอบถูกทุกข้อ = +4 pts</span>
+  </div>
+
+  <div class="sec" id="quiz-area">
+    <!-- Question 1 -->
+    <div id="q1" style="display:block">
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:16px;line-height:1.5">ที่ความเร็ว 60 km/h ระยะหยุดรถโดยประมาณเท่าไหร่?</div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">A</div><span style="font-size:14px;color:#111">15 เมตร</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'correct')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">B</div><span style="font-size:14px;color:#111">36 เมตร</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">C</div><span style="font-size:14px;color:#111">60 เมตร</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">D</div><span style="font-size:14px;color:#111">100 เมตร</span></div>
+      <div id="q1-feedback" style="display:none;padding:10px 12px;border-radius:10px;margin-top:10px;font-size:13px"></div>
+      <button id="q1-next" class="btn-p" style="display:none" onclick="nextQ(2)">ข้อถัดไป →</button>
+    </div>
+
+    <!-- Question 2 -->
+    <div id="q2" style="display:none">
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:16px;line-height:1.5">Harsh Brake คืออะไรในระบบ Safety Credit?</div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">A</div><span style="font-size:14px;color:#111">การขับเร็วเกิน 60 km/h</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'correct')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">B</div><span style="font-size:14px;color:#111">การชะลอความเร็วกะทันหันด้วยแรง G สูง</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">C</div><span style="font-size:14px;color:#111">การจอดรถในที่ห้ามจอด</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">D</div><span style="font-size:14px;color:#111">การใช้โทรศัพท์ขณะขับ</span></div>
+      <div id="q2-feedback" style="display:none;padding:10px 12px;border-radius:10px;margin-top:10px;font-size:13px"></div>
+      <button id="q2-next" class="btn-p" style="display:none" onclick="nextQ(3)">ข้อถัดไป →</button>
+    </div>
+
+    <!-- Question 3 -->
+    <div id="q3" style="display:none">
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:16px;line-height:1.5">Dual Evidence ใน Safety Credit หมายถึงอะไร?</div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">A</div><span style="font-size:14px;color:#111">มีกล้องสองตัวบนถนน</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">B</div><span style="font-size:14px;color:#111">วัดคะแนนสองครั้ง</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'correct')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">C</div><span style="font-size:14px;color:#111">ยืนยันด้วย Smartphone + Radar พร้อมกัน</span></div>
+      <div class="quiz-opt" onclick="selectAns(this,'wrong')"><div style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#555;flex-shrink:0">D</div><span style="font-size:14px;color:#111">ระบบ GPS สองตัว</span></div>
+      <div id="q3-feedback" style="display:none;padding:10px 12px;border-radius:10px;margin-top:10px;font-size:13px"></div>
+      <button id="q3-next" class="btn-p" style="display:none" onclick="showQuizResult()">ดูผลลัพธ์ →</button>
+    </div>
+
+    <!-- Result -->
+    <div id="q-result" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:48px;margin-bottom:12px" id="result-emoji">🎉</div>
+      <div style="font-size:20px;font-weight:700;color:#111;margin-bottom:6px" id="result-title">ยอดเยี่ยม!</div>
+      <div style="font-size:14px;color:#888;margin-bottom:20px" id="result-sub">ตอบถูก 3/3 ข้อ</div>
+      <div style="padding:16px;background:#E1F5EE;border-radius:16px;margin-bottom:16px">
+        <div style="font-size:13px;color:#085041;font-weight:600" id="result-pts">+4 pts รับแล้ว</div>
+        <div style="font-size:12px;color:#0F6E56;margin-top:4px">Education bonus อัปเดตแล้ว</div>
+      </div>
+      <button class="btn-p" onclick="nav('education')" style="max-width:240px;margin:0 auto;display:block">กลับหน้า Education</button>
+    </div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+</div>
+
+<!-- ░░ TIER ░░ -->
+<div id="pg-tier" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:18px 16px 4px;font-size:20px;font-weight:700;color:#111">สิทธิพิเศษ</div>
+  <div style="padding:6px 16px 14px;font-size:13px;color:#888;line-height:1.7">คะแนนของคุณ <strong style="color:#111">78 คะแนน</strong> อยู่ใน <strong style="color:#1D9E75">Green tier</strong><br><strong style="color:#1D9E75">คะแนนถึงเกณฑ์ = ใช้สิทธิ์ได้ทันที</strong> ไม่ต้องแลกหรือสะสม</div>
+
+  <!-- Red -->
+  <div style="margin:0 16px 10px;padding:14px;border-radius:16px;background:#FFEBEE;border:1.5px solid #FFCDD2">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="badge b-red">● Red — At Risk</span><span style="font-size:12px;color:#888">0–49 คะแนน</span></div>
+    <div style="font-size:13px;color:#7F1D1D;line-height:1.7">ยังไม่มีสิทธิพิเศษ<br>รับการแจ้งเตือน + คลิปสอนใน Education</div>
+  </div>
+
+  <!-- Amber -->
+  <div style="margin:0 16px 10px;padding:14px;border-radius:16px;background:#FFF8E1;border:1.5px solid #FFE082">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="badge b-amber">● Amber — Improving</span><span style="font-size:12px;color:#888">50–69 คะแนน</span></div>
+    <div style="font-size:13px;color:#7B5800;line-height:1.8">✓ ส่วนลดร้านค้าพาร์ตเนอร์ 5%<br>✓ ที่จอดรถพิเศษ (จำกัดโควต้า)</div>
+  </div>
+
+  <!-- Green ACTIVE -->
+  <div style="margin:0 16px 10px;padding:14px;border-radius:16px;background:#E1F5EE;border:2px solid #1D9E75">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px"><span class="badge b-green">● Green — Safe</span><span style="font-size:11px;font-weight:700;color:#fff;background:#1D9E75;padding:2px 9px;border-radius:20px">คุณอยู่ที่นี่</span></div>
+      <span style="font-size:12px;color:#888">70–84 คะแนน</span>
+    </div>
+    <div style="font-size:13px;color:#085041;line-height:1.8;font-weight:500">✓ ส่วนลดประกันภัย 5% ต่อปี<br>✓ ที่จอดรถฟรีไม่จำกัด<br>✓ ส่วนลดร้านค้าพาร์ตเนอร์ 10%<br>✓ แจ้งเตือน Radar ล่วงหน้า</div>
+    <button class="btn-p" style="margin-top:12px;padding:11px;font-size:13px" onclick="nav('benefit-detail')">ใช้สิทธิพิเศษของฉัน</button>
+  </div>
+
+  <!-- Blue -->
+  <div style="margin:0 16px 16px;padding:14px;border-radius:16px;background:#E3F2FD;border:1.5px solid #BBDEFB;opacity:.65">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span class="badge b-blue">● Blue — Champion</span><span style="font-size:12px;color:#888">85–100 คะแนน</span></div>
+    <div style="font-size:13px;color:#0C447C;line-height:1.8">✓ ส่วนลดประกันภัย 15% ต่อปี<br>✓ Priority รับงานก่อนไรเดอร์อื่น<br>✓ ส่วนลดร้านค้า 20%<br>✓ Champion badge + VIP ที่จอดรถ</div>
+    <div style="margin-top:10px;font-size:12px;color:#1976D2;font-weight:500">อีก 7 คะแนน → Blue tier</div>
+    <div class="bar-t" style="margin-top:6px"><div class="bar-f" style="width:91%;background:#1976D2"></div></div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+</div>
+
+<!-- ░░ BENEFIT DETAIL ░░ -->
+<div id="pg-benefit-detail" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:16px 16px 6px;display:flex;align-items:center;gap:8px">
+    <button class="back-btn" onclick="nav('tier')"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M14 6L9 11l5 5" stroke="#666" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <span style="font-size:17px;font-weight:700;color:#111">สิทธิพิเศษของฉัน</span>
+  </div>
+  <div style="margin:12px 16px;padding:12px 14px;background:#E1F5EE;border-radius:14px;border:1px solid #9FE1CB">
+    <div style="font-size:13px;color:#085041;font-weight:700">Green tier · Score 78/100</div>
+    <div style="font-size:12px;color:#0F6E56;margin-top:2px">คะแนนถึงเกณฑ์แล้ว · สิทธิ์ด้านล่างใช้ได้ทันที</div>
+  </div>
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">สิทธิ์ที่ใช้ได้ตอนนี้</span></div>
+
+    <div class="card" style="margin-bottom:10px;cursor:pointer">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:48px;height:48px;border-radius:14px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px">🔒</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700;color:#111">ส่วนลดประกันภัย 5%</div>
+          <div style="font-size:12px;color:#888;margin-top:2px">ไทยวิวัฒน์ประกันภัย · ต่ออายุครั้งถัดไป</div>
+          <div style="margin-top:6px;font-size:12px;color:#085041;font-weight:600">คะแนนถึงเกณฑ์ · ใช้สิทธิ์ได้ทันที ✓</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;cursor:pointer">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:48px;height:48px;border-radius:14px;background:#FFF8E1;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px">🅿️</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700;color:#111">ที่จอดรถฟรีไม่จำกัด</div>
+          <div style="font-size:12px;color:#888;margin-top:2px">ลานจอดรถ มรภ. นครปฐม</div>
+          <div style="margin-top:6px;font-size:12px;color:#085041;font-weight:600">คะแนนถึงเกณฑ์ · ใช้สิทธิ์ได้ทันที ✓</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:48px;height:48px;border-radius:14px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px">🏪</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700;color:#111">ส่วนลดร้านค้า 10%</div>
+          <div style="font-size:12px;color:#888;margin-top:2px">10 ร้านค้าในพื้นที่พุทธมณฑล</div>
+          <div style="margin-top:6px;font-size:12px;color:#085041;font-weight:600">คะแนนถึงเกณฑ์ · ใช้สิทธิ์ได้ทันที ✓</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 5l4 4-4 4" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding:12px;background:#f7f7f7;border-radius:12px;font-size:12px;color:#888;line-height:1.7">
+      💡 สิทธิ์ของคุณอัปเดตอัตโนมัติเมื่อ score เปลี่ยน tier ไม่ต้องทำอะไรเพิ่ม
+    </div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+</div>
+
+<!-- ░░ PROFILE ░░ -->
+<div id="pg-profile" style="display:none;flex:1;flex-direction:column">
+<div class="scroll">
+  <div style="padding:24px 16px 16px;text-align:center">
+    <div style="width:80px;height:80px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#085041;margin:0 auto;border:2px solid #5DCAA5">ฟ</div>
+    <div style="font-size:20px;font-weight:700;color:#111;margin-top:12px">ฟร้อง</div>
+    <div style="font-size:13px;color:#888;margin-top:3px">ไรเดอร์ · สมาชิกตั้งแต่ มี.ค. 2568</div>
+    <div style="margin-top:10px"><span class="badge b-green">Green — Safe tier</span></div>
+  </div>
+  <div class="g3" style="padding:0 16px 16px">
+    <div class="stat"><div class="stat-v">78</div><div class="stat-l">score</div></div>
+    <div class="stat"><div class="stat-v" style="color:#1D9E75">24</div><div class="stat-l">trips</div></div>
+    <div class="stat"><div class="stat-v" style="color:#7B1FA2">7/8</div><div class="stat-l">edu pts</div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">ข้อมูลบัญชี</span></div>
+    <div class="card" style="padding:2px 14px">
+      <div class="prow"><span style="font-size:13px;color:#888">ชื่อ</span><span style="font-size:13px;color:#111;font-weight:500">ฟร้อง สมิธ</span></div>
+      <div class="prow"><span style="font-size:13px;color:#888">เบอร์โทร</span><span style="font-size:13px;color:#111;font-weight:500">081-234-5678</span></div>
+      <div class="prow"><span style="font-size:13px;color:#888">ประเภท</span><span class="badge b-amber" style="font-size:11px">ไรเดอร์</span></div>
+      <div class="prow"><span style="font-size:13px;color:#888">ยานพาหนะ</span><span style="font-size:13px;color:#111;font-weight:500">Honda Wave 125</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-hd"><span class="sec-title">การตั้งค่า</span></div>
+    <div class="card" style="padding:2px 14px">
+      <div class="prow"><span style="font-size:13px;color:#111">การแจ้งเตือน</span><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:#1D9E75;font-weight:500">เปิดอยู่</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#ccc" stroke-width="1.3" stroke-linecap="round"/></svg></div></div>
+      <div class="prow"><span style="font-size:13px;color:#111">ความเป็นส่วนตัว (PDPA)</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#ccc" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+      <div class="prow"><span style="font-size:13px;color:#111">เกี่ยวกับแอป</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#ccc" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+    </div>
+  </div>
+  <div class="sec">
+    <button class="btn-s" style="color:#E53935" onclick="nav('onboard')">ออกจากระบบ</button>
+  </div>
+  <div style="height:20px"></div>
+</div>
+</div>
+
+</div><!-- end screen -->
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <button class="nb" onclick="nav('home')" id="nb-home">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" id="ic-home"><path d="M3 11L11 3l8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5V18a1 1 0 001 1h4v-4h2v4h4a1 1 0 001-1V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span class="nl on" id="nl-home">หน้าหลัก</span>
+  </button>
+  <button class="nb" onclick="nav('trips')" id="nb-trips">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" id="ic-trips"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M11 7v4.5l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span class="nl" id="nl-trips">Trips</span>
+  </button>
+  <button class="nb" onclick="nav('education')" id="nb-education">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" id="ic-education"><path d="M11 3L2 8l9 5 9-5-9-5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 8v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M6 10.5V15c0 1.7 2.2 3 5 3s5-1.3 5-3v-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span class="nl" id="nl-education">Education</span>
+  </button>
+  <button class="nb" onclick="nav('tier')" id="nb-tier">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" id="ic-tier"><path d="M11 2L5 5.5v7c0 4.5 3 7.5 6 8.5 3-1 6-4 6-8.5v-7L11 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 11l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="nl" id="nl-tier">สิทธิ์ฉัน</span>
+  </button>
+  <button class="nb" onclick="nav('profile')" id="nb-profile">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" id="ic-profile"><circle cx="11" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span class="nl" id="nl-profile">โปรไฟล์</span>
+  </button>
+</nav>
+</div>
+
+<script>
+const allPages=['onboard','home','trips','trip-detail','education','video-player','quiz','tier','benefit-detail','profile'];
+const navKeys=['home','trips','education','tier','profile'];
+let quizScore=0, currentQ=1;
+
+function nav(p){
+  allPages.forEach(id=>{
+    const el=document.getElementById('pg-'+id);
+    if(el) el.style.display='none';
+  });
+  const el=document.getElementById('pg-'+p);
+  if(el){el.style.display='flex';el.style.flexDirection='column';}
+
+  // show/hide navbar
+  const nb=document.querySelector('.navbar');
+  nb.style.display = ['onboard','video-player','quiz','trip-detail','benefit-detail'].includes(p) ? 'none' : 'flex';
+
+  navKeys.forEach(id=>{
+    const lbl=document.getElementById('nl-'+id);
+    if(lbl) lbl.className='nl'+(id===p?' on':'');
+    const ic=document.getElementById('ic-'+id);
+    if(ic){
+      const els=ic.querySelectorAll('path,circle');
+      els.forEach(s=>s.setAttribute('stroke',id===p?'#1D9E75':'currentColor'));
+    }
+  });
+
+  const sc=el&&el.querySelector('.scroll');
+  if(sc) sc.scrollTop=0;
+  if(p==='home') setTimeout(drawRing,50);
+  if(p==='video-player') startVideoMock();
+  if(p==='quiz') resetQuiz();
+}
+
+// Ring
+function drawRing(){
+  const c=document.getElementById('ring');if(!c)return;
+  const ctx=c.getContext('2d');
+  const score=78,cx=85,cy=85,r=68,lw=11;
+  const sa=Math.PI*0.75,tot=Math.PI*1.5,ea=sa+tot*(score/100);
+  ctx.clearRect(0,0,170,170);
+  ctx.beginPath();ctx.arc(cx,cy,r,sa,sa+tot);ctx.strokeStyle='#f0f0f0';ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r,sa,ea);ctx.strokeStyle='#1D9E75';ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+  [[0,50,'#E53935'],[50,70,'#F57F17'],[70,85,'#1D9E75'],[85,100,'#1976D2']].forEach(([s0,s1,col])=>{
+    if(score>s0){
+      const a0=sa+tot*(s0/100),a1=sa+tot*(Math.min(s1,score)/100);
+      ctx.beginPath();ctx.arc(cx,cy,r-lw-6,a0,a1);ctx.strokeStyle=col;ctx.lineWidth=3.5;ctx.lineCap='round';ctx.stroke();
+    }
+  });
+}
+
+// Video mock
+let vpInterval=null;
+function startVideoMock(){
+  clearInterval(vpInterval);
+  let pct=0;
+  const bar=document.getElementById('vpbar');
+  const timeEl=document.getElementById('vptime');
+  const btn=document.getElementById('vp-done-btn');
+  const hint=document.getElementById('vp-hint');
+  if(bar) bar.style.width='0%';
+  vpInterval=setInterval(()=>{
+    pct+=1;
+    if(bar) bar.style.width=pct+'%';
+    const total=150, elapsed=Math.floor(total*pct/100);
+    const m=Math.floor(elapsed/60),s=elapsed%60;
+    const tm=Math.floor(total/60),ts=total%60;
+    if(timeEl) timeEl.textContent=m+':'+(s<10?'0':'')+s+' / '+tm+':'+(ts<10?'0':'')+ts;
+    if(pct>=80 && btn){
+      btn.style.background='#1D9E75';
+      btn.textContent='รับ +2 pts สำหรับคลิปนี้';
+      if(hint) hint.textContent='ดูเกิน 80% แล้ว กดรับคะแนนได้เลย';
+    }
+    if(pct>=100) clearInterval(vpInterval);
+  },80);
+}
+function completeVideo(){
+  const btn=document.getElementById('vp-done-btn');
+  if(btn && btn.style.background==='rgb(29, 158, 117)'){
+    btn.textContent='รับ +2 pts แล้ว ✓';
+    btn.style.background='#9E9E9E';
+    btn.disabled=true;
+    setTimeout(()=>nav('education'),800);
+  }
+}
+
+// Quiz
+const answers=['correct','correct','correct'];
+function resetQuiz(){
+  quizScore=0;currentQ=1;
+  document.getElementById('q-num').textContent='1';
+  ['q1','q2','q3'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display=id==='q1'?'block':'none';
+    const opts=el&&el.querySelectorAll('.quiz-opt');
+    if(opts) opts.forEach(o=>{o.className='quiz-opt';o.style.pointerEvents='auto';});
+    const fb=document.getElementById(id+'-feedback');
+    if(fb) fb.style.display='none';
+    const nb=document.getElementById(id+'-next');
+    if(nb) nb.style.display='none';
+  });
+  const qr=document.getElementById('q-result');
+  if(qr) qr.style.display='none';
+}
+function selectAns(el,type){
+  const parent=el.closest('[id^="q"]');
+  if(!parent) return;
+  const opts=parent.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>o.style.pointerEvents='none');
+  el.className='quiz-opt '+(type==='correct'?'correct':'wrong');
+  if(type==='correct') quizScore++;
+  const qid='q'+currentQ;
+  const fb=document.getElementById(qid+'-feedback');
+  if(fb){
+    fb.style.display='block';
+    fb.style.background=type==='correct'?'#E1F5EE':'#FFEBEE';
+    fb.style.color=type==='correct'?'#085041':'#7F1D1D';
+    fb.textContent=type==='correct'?'✓ ถูกต้อง!':'✗ ไม่ถูก — คำตอบที่ถูกคือ B';
+  }
+  const nb=document.getElementById(qid+'-next');
+  if(nb) nb.style.display='block';
+}
+function nextQ(n){
+  document.getElementById('q'+currentQ).style.display='none';
+  currentQ=n;
+  document.getElementById('q-num').textContent=n;
+  document.getElementById('q'+n).style.display='block';
+}
+function showQuizResult(){
+  document.getElementById('q3').style.display='none';
+  const r=document.getElementById('q-result');r.style.display='block';
+  const emoji=document.getElementById('result-emoji');
+  const title=document.getElementById('result-title');
+  const sub=document.getElementById('result-sub');
+  const pts=document.getElementById('result-pts');
+  if(quizScore===3){emoji.textContent='🎉';title.textContent='ยอดเยี่ยม!';pts.textContent='+4 pts รับแล้ว';}
+  else if(quizScore===2){emoji.textContent='👍';title.textContent='เก่งมาก!';pts.textContent='+2 pts รับแล้ว';}
+  else{emoji.textContent='📚';title.textContent='ลองอีกครั้ง';pts.textContent='+0 pts — ลองใหม่สัปดาห์หน้า';}
+  sub.textContent='ตอบถูก '+quizScore+'/3 ข้อ';
+}
+
+// Clock
+function tick(){const d=new Date();const el=document.getElementById('clk');if(el)el.textContent=d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();}
+tick();setInterval(tick,15000);
+
+nav('onboard');
+</script>
+</body>
+</html>
